@@ -98,7 +98,26 @@ pub enum TypeKind {
     BooleanType,
 }
 
-pub enum Keywords {
+#[derive(Clone, Debug, PartialEq)]
+pub enum Token {
+    StatementList,
+    BlockStatement,
+    IfStatement,
+    FunctionDefinition,
+    Arguements,
+    Indentifier,
+    NumericLiteral(f64),
+    Operator,
+    BinaryExpression,
+    UnaryExpression,
+}
+
+pub struct Node<T> {
+    token_type: Token,
+    value: T,
+}
+
+pub enum Keyword {
     // Functional
     Function,
     Return,
@@ -158,12 +177,27 @@ pub enum Symbols {
 }
 
 pub enum ParseError {
-    Unexpected(SpannedToken),
-    DuplicateModifier(SpannedToken),
-    Syntax(SpannedToken),
+    Unexpected(Token),
+    DuplicateModifier(Token),
+    Syntax(Token),
 }
 
 pub struct Parser<'a> {
-    tokens: &'a [SpannedToken],
+    tokens: &'a [Token],
     pos: usize,
 }
+
+/*
+pub trait Compile {
+    type Output;
+
+    fn from_ast(ast: Vec<Node>) -> Self::Output;
+
+    fn from_source(source: &str) -> Self::Output {
+        println!("Compiling the source: {}", source);
+        let ast: Vec<Node> = parser::parse(source).unwrap();
+        println!("{:?}", ast);
+        Self::from_ast(ast)
+    }
+}
+*/

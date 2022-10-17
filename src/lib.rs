@@ -1,5 +1,6 @@
 use wasm_bindgen::prelude::*;
 mod definitions;
+mod parser;
 
 #[wasm_bindgen]
 pub fn moch(buf: String) -> String {
@@ -64,6 +65,7 @@ pub fn compile(buf: String) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use pretty_assertions::assert_ne;
 
     #[test]
     fn moch_uniqueness() {
