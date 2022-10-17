@@ -1,6 +1,13 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+/// # Definitions
+///
+/// This file contains all the definitions for the hatchling lang compiler
+
+/// ## Location
+///
+/// x & y is relative to the window screen
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Location {
     x: i32,
@@ -82,4 +89,81 @@ impl Response {
             locations,
         }
     }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub enum TypeKind {
+    NumberType,
+    StringType,
+    BooleanType,
+}
+
+pub enum Keywords {
+    // Functional
+    Function,
+    Return,
+
+    // BooleanType
+    True,
+    False,
+
+    // Character
+    Say,
+    Move,
+    Position,
+    ID,
+    Hair,
+    Skin,
+    Eyes,
+    Outfit,
+    Background,
+    Left,
+    Right,
+    Up,
+    Down,
+
+    // Conditionals
+    And,
+    Or,
+    Not,
+    If,
+    Elseif,
+    Else,
+    Isequal,
+    Greaterthan,
+    Lessthan,
+
+    // Build in functions
+    Powerof,
+}
+
+pub enum Symbols {
+    // Special
+    ParensL,
+    ParensR,
+
+    // Operations
+    OpsPlus,
+    OpsMinus,
+    OpsMultiply,
+    OpsDivide,
+    OpsModulus,
+
+    // File
+    Eos,
+    Eof,
+
+    // Error
+    Invalid,
+}
+
+pub enum ParseError {
+    Unexpected(SpannedToken),
+    DuplicateModifier(SpannedToken),
+    Syntax(SpannedToken),
+}
+
+pub struct Parser<'a> {
+    tokens: &'a [SpannedToken],
+    pos: usize,
 }
