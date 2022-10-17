@@ -1,85 +1,5 @@
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use wasm_bindgen::prelude::*;
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Location {
-    x: i32,
-    y: i32,
-    character_id: String,
-    order: usize,
-}
-
-impl Location {
-    fn new(x: i32, y: i32, character_id: String, order: usize) -> Self {
-        Self {
-            x,
-            y,
-            character_id,
-            order,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Message {
-    message: String,
-    character_id: String,
-    order: usize,
-}
-
-impl Message {
-    fn new(message: String, character_id: String, order: usize) -> Self {
-        Self {
-            message,
-            character_id,
-            order,
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Character {
-    hair_color: String,
-    eye_color: String,
-    skin_color: String,
-    outfit: String,
-    id: String,
-}
-
-impl Character {
-    fn new(hair_color: String, eye_color: String, skin_color: String, outfit: String) -> Self {
-        let id = Uuid::new_v4().to_string();
-        Self {
-            hair_color,
-            eye_color,
-            skin_color,
-            outfit,
-            id,
-        }
-    }
-
-    fn get_id(&self) -> String {
-        self.id.clone()
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Response {
-    characters: Vec<Character>,
-    messages: Vec<Message>,
-    locations: Vec<Location>,
-}
-
-impl Response {
-    fn new(characters: Vec<Character>, messages: Vec<Message>, locations: Vec<Location>) -> Self {
-        Self {
-            characters,
-            messages,
-            locations,
-        }
-    }
-}
+mod definitions;
 
 #[wasm_bindgen]
 pub fn moch(buf: String) -> String {
@@ -87,14 +7,14 @@ pub fn moch(buf: String) -> String {
 
     let mut order: usize = 0;
 
-    let mut characters = Vec::<Character>::new();
-    let mut messages = Vec::<Message>::new();
-    let mut locations = Vec::<Location>::new();
+    let mut characters = Vec::<definitions::Character>::new();
+    let mut messages = Vec::<definitions::Message>::new();
+    let mut locations = Vec::<definitions::Location>::new();
 
     let count = rand::random::<usize>() % 10;
 
     for _ in 0..count {
-        characters.push(Character::new(
+        characters.push(definitions::Character::new(
             "hair".to_owned(),
             "eye".to_owned(),
             "skin".to_owned(),
@@ -103,7 +23,7 @@ pub fn moch(buf: String) -> String {
     }
 
     for i in 0..count {
-        messages.push(Message::new(
+        messages.push(definitions::Message::new(
             "message".to_owned(),
             characters[i].get_id(),
             order,
@@ -114,7 +34,12 @@ pub fn moch(buf: String) -> String {
     let mut x: i32 = 1;
     let mut y: i32 = 1;
     for i in 0..count {
-        locations.push(Location::new(x, y, characters[i].get_id(), order));
+        locations.push(definitions::Location::new(
+            x,
+            y,
+            characters[i].get_id(),
+            order,
+        ));
         if i % 2 == 0 {
             x *= i as i32;
             y *= -1 * i as i32;
@@ -126,7 +51,7 @@ pub fn moch(buf: String) -> String {
         order += 1;
     }
 
-    let response = Response::new(characters, messages, locations);
+    let response = definitions::Response::new(characters, messages, locations);
     serde_json::to_string(&response).unwrap()
 }
 
@@ -145,6 +70,12 @@ mod tests {
         let buf = String::from(" ");
         let moch_reponse0 = moch(buf.clone());
         let moch_reponse1 = moch(buf);
+
+        println!("moch reponse 0");
+        println!("{:#?}", moch_reponse0);
+
+        println!("moch reponse 1");
+        println!("{:#?}", moch_reponse1);
 
         assert_ne!(moch_reponse0, moch_reponse1);
     }
