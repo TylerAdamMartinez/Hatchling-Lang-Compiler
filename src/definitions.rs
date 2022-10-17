@@ -107,6 +107,7 @@ pub enum Token {
     Arguements,
     Indentifier,
     NumericLiteral(f64),
+    StringLiteral(String),
     Operator,
     BinaryExpression,
     UnaryExpression,
