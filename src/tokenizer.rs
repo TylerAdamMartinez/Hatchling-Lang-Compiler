@@ -2,6 +2,7 @@ use crate::definitions;
 use lazy_static::lazy_static;
 use regex::Regex;
 
+#[allow(dead_code)]
 pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
     let length = buf.len();
     let mut start = 0;
@@ -13,6 +14,7 @@ pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
         static ref STRING: Regex = Regex::new(r#""(.*?)""#).unwrap();
         static ref WHITESPACE: Regex = Regex::new(r"\s+").unwrap();
         static ref COMMENTS: Regex = Regex::new(r"//.*").unwrap();
+        static ref MULTI_LINE_COMMENTS: Regex = Regex::new(r##"/\*[\s\S]*?\*/"##).unwrap();
     }
 
     // need to splice buf from cursor
@@ -24,6 +26,10 @@ pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
             cursor = start + 1;
         } else if &buf[start..cursor + 1] == r"//" {
             let found = COMMENTS.find(&buf[start..]).unwrap();
+            start += found.end();
+            cursor = start + 1;
+        } else if &buf[start..cursor + 1] == r"/*" {
+            let found = MULTI_LINE_COMMENTS.find(&buf[start..]).unwrap();
             start += found.end();
             cursor = start + 1;
         } else if DIGIT.is_match(&buf[start..cursor]) {
@@ -57,7 +63,7 @@ pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
 }
 
 #[cfg(test)]
-mod tokenizer_tests {
+mod tokenizer_tests_simple {
     use super::*;
     use pretty_assertions::assert_eq;
 
@@ -200,5 +206,53 @@ mod tokenizer_tests {
 
         let result = tokenizer(&program);
         assert_eq!(result, vec![definitions::Token::NumericLiteral(7489327.0)]);
+    }
+}
+
+#[cfg(test)]
+mod tokenizer_tests_multi {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn multi_numberic_string_literal_with_single_comment() {
+        let program = String::from(
+            r#"     7489327    
+            // TODO: write more test 
+            //
+            //
+             " Another string literal" "#,
+        );
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![
+                definitions::Token::NumericLiteral(7489327.0),
+                definitions::Token::StringLiteral(r#"" Another string literal""#.to_owned())
+            ]
+        );
+    }
+
+    #[test]
+    fn multi_numberic_string_literal_with_multi_comment() {
+        let program = String::from(
+            r#" " Tyler was here " 
+            /* TODO: write more test 
+            *   Also make sure to add multi-line doc comments 
+            *
+            */
+            "president " 45 "#,
+        );
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![
+                definitions::Token::StringLiteral(r#"" Tyler was here ""#.to_owned()),
+                definitions::Token::StringLiteral(r#""president ""#.to_owned()),
+                definitions::Token::NumericLiteral(45.0),
+            ]
+        );
     }
 }
