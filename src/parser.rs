@@ -1,20 +1,19 @@
+#[allow(unused_imports)]
 use crate::definitions;
 
 #[allow(dead_code)]
-pub fn parser(buf: &str) -> definitions::Token {
-    return definitions::Token::NumericLiteral(buf.parse::<f64>().unwrap());
+#[allow(unused_variables)]
+pub fn parser(buf: &str) {
+    todo!()
 }
 
 #[cfg(test)]
-mod parser_tests {
+mod parser_tests_simple {
+    #[allow(unused_imports)]
     use super::*;
+    #[allow(unused_imports)]
     use pretty_assertions::assert_eq;
 
     #[test]
-    fn simple_number() {
-        let program = String::from("42");
-
-        let result = parser(&program);
-        assert_eq!(result, definitions::Token::NumericLiteral(42.0));
-    }
+    fn simple_parse() {}
 }
