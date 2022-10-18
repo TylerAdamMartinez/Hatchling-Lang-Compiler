@@ -91,6 +91,7 @@ impl Response {
     }
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TypeKind {
     NumberType,
@@ -98,6 +99,7 @@ pub enum TypeKind {
     BooleanType,
 }
 
+#[allow(dead_code)]
 #[derive(Clone, Debug, PartialEq)]
 pub enum Token {
     StatementList,
@@ -113,11 +115,13 @@ pub enum Token {
     UnaryExpression,
 }
 
+#[allow(dead_code)]
 pub struct Node<T> {
     token_type: Token,
     value: T,
 }
 
+#[allow(dead_code)]
 pub enum Keyword {
     // Functional
     Function,
@@ -157,6 +161,7 @@ pub enum Keyword {
     Powerof,
 }
 
+#[allow(dead_code)]
 pub enum Symbols {
     // Special
     ParensL,
@@ -177,12 +182,14 @@ pub enum Symbols {
     Invalid,
 }
 
+#[allow(dead_code)]
 pub enum ParseError {
     Unexpected(Token),
     DuplicateModifier(Token),
     Syntax(Token),
 }
 
+#[allow(dead_code)]
 pub struct Parser<'a> {
     tokens: &'a [Token],
     pos: usize,

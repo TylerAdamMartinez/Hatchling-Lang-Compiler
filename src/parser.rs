@@ -1,5 +1,6 @@
 use crate::definitions;
 
+#[allow(dead_code)]
 pub fn parser(buf: &str) -> definitions::Token {
     return definitions::Token::NumericLiteral(buf.parse::<f64>().unwrap());
 }
