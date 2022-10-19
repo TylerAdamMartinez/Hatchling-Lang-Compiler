@@ -121,12 +121,6 @@ pub enum Token {
 }
 
 #[allow(dead_code)]
-pub struct Node<T> {
-    token_type: Token,
-    value: T,
-}
-
-#[allow(dead_code)]
 pub enum Keyword {
     // Functional
     Function,
