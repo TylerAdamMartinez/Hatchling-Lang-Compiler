@@ -13,7 +13,7 @@ pub fn moch(buf: String) -> String {
     let mut messages = Vec::<definitions::Message>::new();
     let mut locations = Vec::<definitions::Location>::new();
 
-    let count = rand::random::<usize>() % 10;
+    let count = rand::random::<usize>() % 9 + 1;
 
     for _ in 0..count {
         characters.push(definitions::Character::new(
@@ -59,6 +59,11 @@ pub fn moch(buf: String) -> String {
 
 #[wasm_bindgen]
 pub fn compile(buf: String) -> Result<String, String> {
+    #[allow(unused_variables)]
+    let tokens = tokenizer::tokenizer(&buf);
+    #[allow(unused_variables)]
+    let ast = parser::parser(&tokens);
+
     println!("{}", &buf);
     todo!()
 }
