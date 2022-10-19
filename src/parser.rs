@@ -3,7 +3,7 @@ use crate::definitions;
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
-pub fn parser(buf: &str) {
+pub fn parser(buf: &Vec<definitions::Token>) {
     todo!()
 }
 
