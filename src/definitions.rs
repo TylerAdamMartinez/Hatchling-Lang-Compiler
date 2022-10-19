@@ -111,6 +111,7 @@ pub enum Token {
     NumericLiteral(f64),
     StringLiteral(String),
     Operator(Operation),
+    Symbol(Symbol),
 
     /// BinaryExpression(
     ///     Operator , BinaryExpression or NumericLiteral , BinaryExpression or NumericLiteral
@@ -175,10 +176,13 @@ pub enum Operation {
     Modulus,
 }
 
+#[allow(dead_code)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Symbol {
     // Special
     ParensL,
     ParensR,
+    SemiColon,
 
     // File
     Eos,
@@ -189,14 +193,14 @@ pub enum Symbol {
 }
 
 #[allow(dead_code)]
+pub struct AST {
+    node: Token,
+    leaves: Vec<Box<AST>>,
+}
+
+#[allow(dead_code)]
 pub enum ParseError {
     Unexpected(Token),
     DuplicateModifier(Token),
     Syntax(Token),
-}
-
-#[allow(dead_code)]
-pub struct Parser<'a> {
-    tokens: &'a [Token],
-    pos: usize,
 }

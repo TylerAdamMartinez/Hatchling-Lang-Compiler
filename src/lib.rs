@@ -59,10 +59,11 @@ pub fn moch(buf: String) -> String {
 
 #[wasm_bindgen]
 pub fn compile(buf: String) -> Result<String, String> {
-    #[allow(unused_variables)]
     let tokens = tokenizer::tokenizer(&buf);
     #[allow(unused_variables)]
     let ast = parser::parser(&tokens);
+
+    // convert AST to JSON here...
 
     println!("{}", &buf);
     todo!()
