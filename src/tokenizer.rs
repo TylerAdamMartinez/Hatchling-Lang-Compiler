@@ -15,6 +15,7 @@ pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
         static ref WHITESPACE: Regex = Regex::new(r"\s+").unwrap();
         static ref COMMENTS: Regex = Regex::new(r"//.*").unwrap();
         static ref MULTI_LINE_COMMENTS: Regex = Regex::new(r##"/\*[\s\S]*?\*/"##).unwrap();
+        static ref OPERATORS: Regex = Regex::new(r"[\+\-\*/\%]").unwrap();
     }
 
     // need to splice buf from cursor
@@ -31,6 +32,25 @@ pub fn tokenizer(buf: &str) -> Vec<definitions::Token> {
         } else if &buf[start..cursor + 1] == r"/*" {
             let found = MULTI_LINE_COMMENTS.find(&buf[start..]).unwrap();
             start += found.end();
+            cursor = start + 1;
+        } else if OPERATORS.is_match(&buf[start..cursor]) {
+            if &buf[start..cursor] == "+" {
+                tokens.push(definitions::Token::Operator(definitions::Operation::Plus));
+            } else if &buf[start..cursor] == "-" {
+                tokens.push(definitions::Token::Operator(definitions::Operation::Minus));
+            } else if &buf[start..cursor] == "*" {
+                tokens.push(definitions::Token::Operator(
+                    definitions::Operation::Multiply,
+                ));
+            } else if &buf[start..cursor] == "/" {
+                tokens.push(definitions::Token::Operator(definitions::Operation::Divide));
+            } else if &buf[start..cursor] == "%" {
+                tokens.push(definitions::Token::Operator(
+                    definitions::Operation::Modulus,
+                ));
+            }
+
+            start = cursor;
             cursor = start + 1;
         } else if DIGIT.is_match(&buf[start..cursor]) {
             let found = DIGIT.find(&buf[start..]).unwrap();
@@ -253,6 +273,104 @@ mod tokenizer_tests_multi {
                 definitions::Token::StringLiteral(r#""president ""#.to_owned()),
                 definitions::Token::NumericLiteral(45.0),
             ]
+        );
+    }
+}
+
+#[cfg(test)]
+mod tokenizer_tests_simple_symbols_and_operators {
+    use super::*;
+    use pretty_assertions::assert_eq;
+
+    #[test]
+    fn symbol_parens_l() {
+        let program = String::from(r#"("#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Symbol(definitions::Symbol::ParensL)]
+        );
+    }
+
+    #[test]
+    fn symbol_parens_r() {
+        let program = String::from(r#")"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Symbol(definitions::Symbol::ParensR)]
+        );
+    }
+
+    #[test]
+    fn symbol_semicolon() {
+        let program = String::from(r#";"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Symbol(definitions::Symbol::SemiColon)]
+        );
+    }
+
+    #[test]
+    fn operator_modulus() {
+        let program = String::from(r#"%"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Operator(
+                definitions::Operation::Modulus
+            )]
+        );
+    }
+
+    #[test]
+    fn operator_divide() {
+        let program = String::from(r#"/"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Operator(definitions::Operation::Divide)]
+        );
+    }
+
+    #[test]
+    fn operator_multiply() {
+        let program = String::from(r#"*"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Operator(
+                definitions::Operation::Multiply
+            )]
+        );
+    }
+
+    #[test]
+    fn operator_minus() {
+        let program = String::from(r#"-"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Operator(definitions::Operation::Minus)]
+        );
+    }
+
+    #[test]
+    fn operator_plus() {
+        let program = String::from(r#"+"#);
+
+        let result = tokenizer(&program);
+        assert_eq!(
+            result,
+            vec![definitions::Token::Operator(definitions::Operation::Plus)]
         );
     }
 }
