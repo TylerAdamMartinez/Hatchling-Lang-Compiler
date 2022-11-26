@@ -2,6 +2,7 @@ use wasm_bindgen::prelude::*;
 mod definitions;
 mod parser;
 mod tokenizer;
+mod utils;
 
 #[wasm_bindgen]
 pub fn moch(buf: String) -> String {
